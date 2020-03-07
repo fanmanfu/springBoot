@@ -58,10 +58,10 @@ public class UserController {
     /*public BaseResponseInfo login(@RequestParam(value = "loginame", required = false) String loginame,
                         @RequestParam(value = "password", required = false) String password,
                         HttpServletRequest request)throws Exception {*/
-    public BaseResponseInfo login(@RequestBody JSONObject data,HttpServletRequest request)throws Exception{
+    public BaseResponseInfo login(HttpServletResponse response,@RequestBody JSONObject datas,HttpServletRequest request)throws Exception{
 
-        String loginame=data.getString("loginame");
-        String password=data.getString("password");
+        String loginame=datas.getString("loginame");
+        String password=datas.getString("password");
         logger.info("============用户登录 login 方法调用开始==============");
         String msgTip = "";
         User user=null;
