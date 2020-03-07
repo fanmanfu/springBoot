@@ -58,7 +58,7 @@ public class UserController {
     /*public BaseResponseInfo login(@RequestParam(value = "loginame", required = false) String loginame,
                         @RequestParam(value = "password", required = false) String password,
                         HttpServletRequest request)throws Exception {*/
-    public BaseResponseInfo login(HttpServletResponse response,@RequestBody JSONObject datas,HttpServletRequest request)throws Exception{
+    public BaseResponseInfo login(@RequestBody JSONObject datas,HttpServletRequest request)throws Exception{
 
         String loginame=datas.getString("loginame");
         String password=datas.getString("password");
@@ -190,12 +190,11 @@ public class UserController {
     }
 
     @PostMapping(value = "/resetPwd")
-    public String resetPwd(@RequestParam("id") Long id,
-                                     HttpServletRequest request) throws Exception {
+    public String resetPwd(@RequestBody JSONObject datas,HttpServletRequest request) throws Exception {
         Map<String, Object> objectMap = new HashMap<String, Object>();
         String password = "123456";
         String md5Pwd = Tools.md5Encryp(password);
-        int update = userService.resetPwd(md5Pwd, id);
+        int update = userService.resetPwd(md5Pwd, Long.parseLong(datas.getString("id")));
         if(update > 0) {
             return returnJson(objectMap, message, ErpInfo.OK.code);
         } else {
@@ -204,8 +203,10 @@ public class UserController {
     }
 
     @PostMapping(value = "/updatePwd")
-    public String updatePwd(@RequestParam("userId") Long userId, @RequestParam("password") String password,
-                            @RequestParam("oldpwd") String oldpwd, HttpServletRequest request)throws Exception {
+    public String updatePwd(@RequestBody JSONObject data,HttpServletRequest request)throws Exception {
+        Long userId = data.getLong("userId");
+        String password = data.getString("password");
+        String oldpwd = data.getString("oldpwd");
         Integer flag = 0;
         Map<String, Object> objectMap = new HashMap<String, Object>();
         try {
@@ -269,10 +270,11 @@ public class UserController {
      * @return java.lang.String
      */
     @GetMapping(value = "/getUserList")
-    public String getUserList(@RequestParam(value = Constants.PAGE_SIZE, required = false) Integer pageSize,
-                                       @RequestParam(value = Constants.CURRENT_PAGE, required = false) Integer currentPage,
-                                       @RequestParam(value = Constants.SEARCH, required = false) String search)throws Exception {
+    public String getUserList(@RequestBody JSONObject data)throws Exception {
 
+        Integer pageSize = data.getInteger(Constants.PAGE_SIZE);
+        Integer currentPage = data.getInteger(Constants.CURRENT_PAGE);
+        String search =data.getString(Constants.SEARCH);
         Map<String, Object> parameterMap = new HashMap<String, Object>();
         //查询参数
         JSONObject obj= JSON.parseObject(search);
@@ -313,7 +315,8 @@ public class UserController {
      */
     @PostMapping("/addUser")
     @ResponseBody
-    public Object addUser(@RequestParam("info") String beanJson, HttpServletRequest request)throws Exception{
+    public Object addUser(@RequestBody JSONObject data, HttpServletRequest request)throws Exception{
+        String beanJson = data.getString("info");
         JSONObject result = ExceptionConstants.standardSuccess();
         Long userNumLimit = Long.parseLong(request.getSession().getAttribute("userNumLimit").toString());
         Long count = userService.countUser(null,null);
@@ -336,9 +339,10 @@ public class UserController {
      * @throws Exception
      */
     @PostMapping(value = "/registerUser")
-    public Object registerUser(@RequestParam(value = "loginame", required = false) String loginame,
-                               @RequestParam(value = "password", required = false) String password,
-                               HttpServletRequest request)throws Exception{
+    public Object registerUser(
+                               @RequestBody JSONObject data,HttpServletRequest request)throws Exception{
+        String loginame = data.getString("loginame");
+        String password = data.getString("password");
         JSONObject result = ExceptionConstants.standardSuccess();
         UserEx ue= new UserEx();
         ue.setUsername(loginame);
@@ -358,7 +362,9 @@ public class UserController {
      */
     @PostMapping("/updateUser")
     @ResponseBody
-    public Object updateUser(@RequestParam("info") String beanJson,@RequestParam("id") Long id)throws Exception{
+    public Object updateUser(@RequestBody JSONObject data)throws Exception{
+        String beanJson = data.getString("info");
+        Long id = data.getLong("id");
         JSONObject result = ExceptionConstants.standardSuccess();
         UserEx ue= JSON.parseObject(beanJson, UserEx.class);
         ue.setId(id);
@@ -367,14 +373,16 @@ public class UserController {
     }
     @PostMapping("/deleteUser")
     @ResponseBody
-    public Object deleteUser(@RequestParam("ids") String ids)throws Exception{
+    public Object deleteUser(@RequestBody JSONObject data)throws Exception{
+        String ids = data.getString("ids");
         JSONObject result = ExceptionConstants.standardSuccess();
         userService.batDeleteUser(ids);
         return result;
     }
     @PostMapping("/batchDeleteUser")
     @ResponseBody
-    public Object batchDeleteUser(@RequestParam("ids") String ids)throws Exception{
+    public Object batchDeleteUser(@RequestBody JSONObject data)throws Exception{
+        String ids = data.getString("ids");
         JSONObject result = ExceptionConstants.standardSuccess();
         userService.batDeleteUser(ids);
         return result;

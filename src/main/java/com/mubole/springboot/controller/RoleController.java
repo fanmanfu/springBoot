@@ -35,8 +35,9 @@ public class RoleController {
      * @return
      */
     @PostMapping(value = "/findUserRole")
-    public JSONArray findUserRole(@RequestParam("UBType") String type, @RequestParam("UBKeyId") String keyId,
-                                  HttpServletRequest request)throws Exception {
+    public JSONArray findUserRole(@RequestBody JSONObject data,HttpServletRequest request)throws Exception {
+        String type=data.getString("UBType");
+        String keyId=data.getString("UBKeyId");
         JSONArray arr = new JSONArray();
         try {
             List<Role> dataList = roleService.findUserRole();
@@ -79,7 +80,8 @@ public class RoleController {
      * @return java.lang.Object
      */
     @RequestMapping(value = "/batchDeleteRoleByIds")
-    public Object batchDeleteRoleByIds(@RequestParam("ids") String ids) throws Exception {
+    public Object batchDeleteRoleByIds(@RequestBody JSONObject data) throws Exception {
+        String ids = data.getString("ids");
         JSONObject result = ExceptionConstants.standardSuccess();
         int i= roleService.batchDeleteRoleByIds(ids);
         if(i<1){
